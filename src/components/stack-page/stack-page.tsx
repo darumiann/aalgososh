@@ -5,40 +5,9 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import styles from "./stack-page.module.css";
 import { ElementStates } from "../../types/element-states";
+import { INewStack, Stack, stack } from "../../utils/stack-page_utils";
+import { DELAY_IN_MS, SHORT_DELAY_IN_MS, delay } from "../../constants/delays";
 
-interface INewStack {
-  letter: string;
-  state: ElementStates;
-}
-
-class Stack<T> {
-  private container: T[] = [];
-
-  push = (item: T): void => {
-    this.container.push(item);
-  };
-
-  pop = (): void => {
-    this.container.pop();
-  };
-
-  getByIndex(index: number, item: T) {
-    this.container[index] = item;
-  }
-
-  clear = (): void => {
-    this.container = [];
-  };
-
-  get items() {
-    return [...this.container];
-  }
-
-  get size() {
-    return this.container.length;
-  }
-}
-const stack = new Stack<INewStack>();
 
 export const StackPage: React.FC = () => {
   const [value, setValue] = useState("");
@@ -66,19 +35,19 @@ export const StackPage: React.FC = () => {
     setValue("");
     setLetters([...stack.items]);
 
-    setTimeout(() => {
-      stack.getByIndex(stack.size - 1, {
-        letter: value,
-        state: ElementStates.Default,
-      });
-      setLetters([...stack.items]);
-      setIsLoading({
-        addButton: false,
-        deleteButton: false,
-        clearButton: false,
-      });
-    }, 500);
+    delay(SHORT_DELAY_IN_MS);
+    stack.getByIndex(stack.size - 1, {
+      letter: value,
+      state: ElementStates.Default,
+    });
+    setLetters([...stack.items]);
+    setIsLoading({
+      addButton: false,
+      deleteButton: false,
+      clearButton: false,
+    });
   };
+
   const handleDelete = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setIsLoading({ addButton: false, deleteButton: true, clearButton: false });
@@ -89,15 +58,14 @@ export const StackPage: React.FC = () => {
     });
     setLetters([...stack.items]);
 
-    setTimeout(() => {
-      stack.pop();
-      setLetters([...stack.items]);
-      setIsLoading({
-        addButton: false,
-        deleteButton: false,
-        clearButton: false,
-      });
-    }, 500);
+    delay(SHORT_DELAY_IN_MS);
+    stack.pop();
+    setLetters([...stack.items]);
+    setIsLoading({
+      addButton: false,
+      deleteButton: false,
+      clearButton: false,
+    });
   };
 
   const handleClearAll = (e: React.MouseEvent<HTMLElement>) => {

@@ -6,167 +6,9 @@ import { Circle } from "../ui/circle/circle";
 import { ArrowIcon } from "../ui/icons/arrow-icon";
 import styles from "./list-page.module.css";
 import { ElementStates } from "../../types/element-states";
-interface ILinkedList<T> {
-  prepend: (element: T) => void;
-  append: (element: T) => void;
-  addByIndex: (element: T, index: number) => void;
-  deleteByIndex: (index: number) => void;
-  deleteHead: () => void;
-  deleteTail: () => void;
-  toArray: () => T[];
-  isEmpty: () => boolean;
-  getByIndex: (index: number) => void;
-}
-class LinkedListNode<T> {
-  value: T;
-  next: LinkedListNode<T> | null;
+import { DELAY_IN_MS, SHORT_DELAY_IN_MS, delay } from "../../constants/delays";
+import { ILinkedList, LinkedListNode, LinkedList, initialArray, linkedList } from "../../utils/list-page_utils";
 
-  constructor(value: T, next?: LinkedListNode<T> | null) {
-    this.value = value;
-    this.next = next === undefined ? null : next;
-  }
-}
-class LinkedList<T> implements ILinkedList<T> {
-  private head: LinkedListNode<T> | null;
-  private size: number;
-
-  constructor(array: T[]) {
-    this.head = null;
-    this.size = 0;
-    array.forEach((item) => this.prepend(item));
-  }
-
-  get listSize(): number {
-    return this.size;
-  }
-
-  get array(): T[] {
-    return this.toArray();
-  }
-
-  get currentHead() {
-    return this.array[0];
-  }
-
-  get currentTail() {
-    return this.array[this.array.length - 1];
-  }
-
-  prepend = (element: T): void => {
-    const node = new LinkedListNode<T>(element);
-    if (!this.isEmpty()) {
-      node.next = this.head;
-      this.head = node;
-    }
-    this.head = node;
-    this.size++;
-  };
-
-  append = (element: T): void => {
-    const node = new LinkedListNode<T>(element);
-    if (this.head === null) {
-      this.head = node;
-    }
-    if (!this.isEmpty()) {
-      let prev = this.head;
-      while (prev?.next) {
-        prev = prev.next;
-      }
-      prev.next = node;
-    }
-    this.size++;
-  };
-
-  addByIndex = (element: T, index: number): void => {
-    if (index < 0 || index > this.size) {
-      return;
-    } else {
-      const newNode = new LinkedListNode<T>(element);
-      if (index === 0) {
-        newNode.next = this.head;
-        this.head = newNode;
-      } else {
-        let current = this.head;
-        let currentIndex = 0;
-        let previous = null;
-
-        while (currentIndex < index) {
-          previous = current;
-          current = current!.next;
-          currentIndex++;
-        }
-        newNode.next = current;
-        previous!.next = newNode;
-      }
-      this.size++;
-    }
-  };
-
-  deleteByIndex = (index: number): void => {
-    if (index < 0 || index >= this.size) return;
-    let current,
-      previous,
-      counter = 0;
-    current = this.head;
-    previous = current;
-
-    if (index === 0) {
-      this.head = current ? current : null;
-    } else {
-      while (counter < index) {
-        counter++;
-        previous = current;
-        if (current) {
-          current = current.next;
-        }
-      }
-      if (previous) {
-        previous.next = current ? current.next : null;
-      }
-    }
-    this.size--;
-  };
-
-  deleteHead = (): void => {
-    if (!this.head) {
-      return;
-    }
-    this.head = this.head.next;
-    this.size--;
-  };
-
-  deleteTail = (): void => {
-    let curr = this.head;
-    let prev;
-    while (curr?.next) {
-      prev = curr;
-      curr = curr.next;
-    }
-    if (prev?.next) {
-      prev.next = null;
-    }
-    this.size--;
-  };
-
-  toArray = (): T[] => {
-    const array = [];
-    let currentNode = this.head;
-    while (currentNode) {
-      array.push(currentNode.value);
-      currentNode = currentNode.next;
-    }
-
-    return array;
-  };
-
-  isEmpty = (): boolean => this.listSize === 0;
-
-  getByIndex = (index: number) => {
-    return this.array[index];
-  };
-}
-const initialArray = ["34", "128", "5", "94"];
-const linkedList = new LinkedList<string>(initialArray);
 
 export const ListPage: React.FC = () => {
   const [value, setValue] = useState("");
@@ -202,138 +44,321 @@ export const ListPage: React.FC = () => {
     setIndexValue(e.target.value);
   };
 
+  // const handleAddToHead = (e: React.MouseEvent<HTMLElement>) => {
+  //   e.preventDefault();
+  //   setIsLoading((prevState) => ({ ...prevState, addToHead: true }));
+  //   setIsDisabled((prevstate) => ({
+  //     ...prevstate,
+  //     removeFromHead: true,
+  //     removeFromTail: true,
+  //   }));
+  //   if (!value) return null;
+
+  //   linkedList.prepend(value);
+  //   setTopCircleIndex(0);
+  //   setTopCircleLetter(value);
+  //   setValue("");
+
+  //   delay(SHORT_DELAY_IN_MS);
+
+  //   setLetters(linkedList.array);
+  //   setTopCircleIndex(-1);
+  //   setTopCircleLetter("");
+  //   setModifiedIndexes([0]);
+
+  //   delay(SHORT_DELAY_IN_MS);
+    
+  //   setModifiedIndexes([]);
+  //   setIsLoading((prevState) => ({ ...prevState, addToHead: false }));
+  //   setIsDisabled((prevstate) => ({
+  //     ...prevstate,
+  //     removeFromHead: false,
+  //     removeFromTail: false,
+  //   }));
+  // };
+
+  // const handleAddToTail = (e: React.MouseEvent<HTMLElement>) => {
+  //   e.preventDefault();
+  //   setIsLoading((prevState) => ({ ...prevState, addInTail: true }));
+  //   setIsDisabled((prevstate) => ({
+  //     ...prevstate,
+  //     removeFromHead: true,
+  //     removeFromTail: true,
+  //   }));
+  //   if (!value) return null;
+
+  //   setTopCircleIndex(linkedList.array.length - 1);
+  //   setTopCircleLetter(value);
+  //   linkedList.append(value);
+  //   setValue("");
+
+  //   delay(SHORT_DELAY_IN_MS);
+    
+  //   setLetters(linkedList.array);
+  //   setTopCircleIndex(-1);
+  //   setTopCircleLetter("");
+    
+  //   setModifiedIndexes([linkedList.array.length - 1]);
+    
+  //   delay(SHORT_DELAY_IN_MS);
+    
+  //   setModifiedIndexes([]);
+  //   setIsLoading((prevState) => ({ ...prevState, addInTail: false }));
+  //   setIsDisabled((prevstate) => ({
+  //     ...prevstate,
+  //     removeFromHead: false,
+  //     removeFromTail: false,
+  //   }));
+  // };
+
+
+  // const handleDeleteFromHead = (e: React.MouseEvent<HTMLElement>) => {
+  //   e.preventDefault();
+  //   setIsLoading((prevState) => ({ ...prevState, removeFromHead: true }));
+  //   setIsDisabled((prevstate) => ({
+  //     ...prevstate,
+  //     removeFromTail: true,
+  //   }));
+  //   setLetters(
+  //     letters.map((letter, index) => {
+  //       if (index === 0) {
+  //         return (letter = "");
+  //       } else {
+  //         return letter;
+  //       }
+  //     })
+  //   );
+  //   setBottomCircleIndex(0);
+  //   setBottomCircleLetter(linkedList.currentHead);
+
+  //   linkedList.deleteHead();
+
+  //   delay(SHORT_DELAY_IN_MS);
+    
+  //   setLetters(linkedList.array);
+  //   setBottomCircleIndex(-1);
+  //   setBottomCircleLetter("");
+  //   setIsLoading((prevState) => ({ ...prevState, removeFromHead: false }));
+  //   setIsDisabled((prevstate) => ({
+  //     ...prevstate,
+  //     removeFromTail: false,
+  //   }));
+  // }
+
+  // const handleDeleteFromTail = (e: React.MouseEvent<HTMLElement>) => {
+  //   e.preventDefault();
+  //   setIsLoading((prevState) => ({ ...prevState, removeFromTail: true }));
+  //   setIsDisabled((prevstate) => ({
+  //     ...prevstate,
+  //     removeFromHead: true,
+  //   }));
+
+  //   setLetters(
+  //     letters.map((letter, index) => {
+  //       if (index === linkedList.array.length - 1) {
+  //         return (letter = "");
+  //       } else {
+  //         return letter;
+  //       }
+  //     })
+  //   );
+  //   setBottomCircleIndex(linkedList.array.length - 1);
+  //   setBottomCircleLetter(linkedList.currentTail);
+  //   linkedList.deleteTail();
+
+  //   delay(SHORT_DELAY_IN_MS);
+    
+  //   setLetters(linkedList.array);
+  //   setBottomCircleIndex(-1);
+  //   setBottomCircleLetter("");
+  //   setIsLoading((prevState) => ({ ...prevState, removeFromTail: false }));
+  //   setIsDisabled((prevState) => ({
+  //     ...prevState,
+  //     removeFromHead: false,
+  //   }));
+  // };
+
   const handleAddToHead = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
+    let counter: number = 0;
     setIsLoading((prevState) => ({ ...prevState, addToHead: true }));
     setIsDisabled((prevstate) => ({
       ...prevstate,
-      removeFromHead: true,
-      removeFromTail: true,
+      addToHead: true,
+      addToTail: true,
     }));
-    if (!value) return null;
+    const interval = setInterval(() => {
+      if (counter + 1 <= Number(indexValue)) {
+        delay(SHORT_DELAY_IN_MS);
+        
+        setChangedIndexes((prevState) => [...prevState, counter - 1]);
+        setTopCircleIndex(counter);
+        setTopCircleLetter(value);
+        counter++;
+      } else {
+        clearInterval(interval);
+        
+        linkedList.addByIndex(value, Number(indexValue));
+        
+        delay(SHORT_DELAY_IN_MS);
+        
+        setModifiedIndexes([Number(indexValue)]);
+        setLetters(linkedList.array);
+        setTopCircleIndex(-1);
+        setTopCircleLetter("");
 
-    linkedList.prepend(value);
-    setTopCircleIndex(0);
-    setTopCircleLetter(value);
-    setValue("");
-
-    setTimeout(() => {
-      setLetters(linkedList.array);
-      setTopCircleIndex(-1);
-      setTopCircleLetter("");
-      setModifiedIndexes([0]);
-
-      setTimeout(() => {
+        delay(SHORT_DELAY_IN_MS);
+        
         setModifiedIndexes([]);
+        setChangedIndexes([]);
         setIsLoading((prevState) => ({ ...prevState, addToHead: false }));
         setIsDisabled((prevstate) => ({
           ...prevstate,
-          removeFromHead: false,
-          removeFromTail: false,
+          addToHead: false,
+          addToTail: false,
         }));
-      }, 500);
-    }, 500);
+      }
+    }, SHORT_DELAY_IN_MS);
+    setIndexValue("");
+    setValue("");
   };
 
   const handleAddToTail = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    setIsLoading((prevState) => ({ ...prevState, addInTail: true }));
+    let counter: number = 0;
+    setIsLoading((prevState) => ({ ...prevState, addToTail: true }));
+    setIsDisabled((prevstate) => ({
+      ...prevstate,
+      addToHead: true,
+      addToTail: true,
+    }));
+    const interval = setInterval(() => {
+      if (counter + 1 <= Number(indexValue)) {
+        delay(SHORT_DELAY_IN_MS);
+        
+        setChangedIndexes((prevState) => [...prevState, counter - 1]);
+        setTopCircleIndex(counter);
+        setTopCircleLetter(value);
+        counter++;
+      } else {
+        clearInterval(interval);
+        
+        linkedList.addByIndex(value, Number(indexValue));
+        
+        delay(SHORT_DELAY_IN_MS);
+        
+        setModifiedIndexes([Number(indexValue)]);
+        setLetters(linkedList.array);
+        setTopCircleIndex(-1);
+        setTopCircleLetter("");
+
+        delay(SHORT_DELAY_IN_MS);
+        
+        setModifiedIndexes([]);
+        setChangedIndexes([]);
+        setIsLoading((prevState) => ({ ...prevState, addToTail: false }));
+        setIsDisabled((prevstate) => ({
+          ...prevstate,
+          addToHead: false,
+          addToTail: false,
+        }));
+      }
+    }, SHORT_DELAY_IN_MS);
+    setIndexValue("");
+    setValue("");
+  };
+
+  const handleDeleteFromHead = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    let counter: number = 0;
+    setIsLoading((prevState) => ({ ...prevState, removeFromHead: true }));
     setIsDisabled((prevstate) => ({
       ...prevstate,
       removeFromHead: true,
       removeFromTail: true,
     }));
-    if (!value) return null;
+    const interval = setInterval(() => {
+      if (counter + 1 <= Number(indexValue)) {
+        delay(SHORT_DELAY_IN_MS);
+        
+        setChangedIndexes((prevState) => [...prevState, counter - 1]);
+        setTopCircleIndex(counter);
+        setTopCircleLetter(value);
+        counter++;
+      } else {
+        clearInterval(interval);
+        
+        linkedList.addByIndex(value, Number(indexValue));
+        
+        delay(SHORT_DELAY_IN_MS);
+        
+        setModifiedIndexes([Number(indexValue)]);
+        setLetters(linkedList.array);
+        setTopCircleIndex(-1);
+        setTopCircleLetter("");
 
-    setTopCircleIndex(linkedList.array.length - 1);
-    setTopCircleLetter(value);
-    linkedList.append(value);
-    setValue("");
-
-    setTimeout(() => {
-      setLetters(linkedList.array);
-      setTopCircleIndex(-1);
-      setTopCircleLetter("");
-
-      setModifiedIndexes([linkedList.array.length - 1]);
-
-      setTimeout(() => {
+        delay(SHORT_DELAY_IN_MS);
+        
         setModifiedIndexes([]);
-        setIsLoading((prevState) => ({ ...prevState, addInTail: false }));
+        setChangedIndexes([]);
+        setIsLoading((prevState) => ({ ...prevState, removeFromHead: false }));
         setIsDisabled((prevstate) => ({
           ...prevstate,
           removeFromHead: false,
           removeFromTail: false,
         }));
-      }, 500);
-    }, 500);
-  };
-
-  const handleDeleteFromHead = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    setIsLoading((prevState) => ({ ...prevState, removeFromHead: true }));
-    setIsDisabled((prevstate) => ({
-      ...prevstate,
-      removeFromTail: true,
-    }));
-    setLetters(
-      letters.map((letter, index) => {
-        if (index === 0) {
-          return (letter = "");
-        } else {
-          return letter;
-        }
-      })
-    );
-    setBottomCircleIndex(0);
-    setBottomCircleLetter(linkedList.currentHead);
-
-    linkedList.deleteHead();
-
-    setTimeout(() => {
-      setLetters(linkedList.array);
-      setBottomCircleIndex(-1);
-      setBottomCircleLetter("");
-      setIsLoading((prevState) => ({ ...prevState, removeFromHead: false }));
-      setIsDisabled((prevstate) => ({
-        ...prevstate,
-        removeFromTail: false,
-      }));
-    }, 500);
+      }
+    }, SHORT_DELAY_IN_MS);
+    setIndexValue("");
+    setValue("");
   };
 
   const handleDeleteFromTail = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
+    let counter: number = 0;
     setIsLoading((prevState) => ({ ...prevState, removeFromTail: true }));
     setIsDisabled((prevstate) => ({
       ...prevstate,
       removeFromHead: true,
+      removeFromTail: true,
     }));
+    const interval = setInterval(() => {
+      if (counter + 1 <= Number(indexValue)) {
+        delay(SHORT_DELAY_IN_MS);
+        
+        setChangedIndexes((prevState) => [...prevState, counter - 1]);
+        setTopCircleIndex(counter);
+        setTopCircleLetter(value);
+        counter++;
+      } else {
+        clearInterval(interval);
+        
+        linkedList.addByIndex(value, Number(indexValue));
+        
+        delay(SHORT_DELAY_IN_MS);
+        
+        setModifiedIndexes([Number(indexValue)]);
+        setLetters(linkedList.array);
+        setTopCircleIndex(-1);
+        setTopCircleLetter("");
 
-    setLetters(
-      letters.map((letter, index) => {
-        if (index === linkedList.array.length - 1) {
-          return (letter = "");
-        } else {
-          return letter;
-        }
-      })
-    );
-    setBottomCircleIndex(linkedList.array.length - 1);
-    setBottomCircleLetter(linkedList.currentTail);
-    linkedList.deleteTail();
-
-    setTimeout(() => {
-      setLetters(linkedList.array);
-      setBottomCircleIndex(-1);
-      setBottomCircleLetter("");
-      setIsLoading((prevState) => ({ ...prevState, removeFromTail: false }));
-      setIsDisabled((prevState) => ({
-        ...prevState,
-        removeFromHead: false,
-      }));
-    }, 500);
+        delay(SHORT_DELAY_IN_MS);
+        
+        setModifiedIndexes([]);
+        setChangedIndexes([]);
+        setIsLoading((prevState) => ({ ...prevState, removeFromTail: false }));
+        setIsDisabled((prevstate) => ({
+          ...prevstate,
+          removeFromHead: false,
+          removeFromTail: false,
+        }));
+      }
+    }, SHORT_DELAY_IN_MS);
+    setIndexValue("");
+    setValue("");
   };
+
+  //
 
   const handleAddByIndex = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -349,39 +374,39 @@ export const ListPage: React.FC = () => {
     });
     const interval = setInterval(() => {
       if (counter + 1 <= Number(indexValue)) {
-        setTimeout(() => {
-          setChangedIndexes((prevState) => [...prevState, counter - 1]);
-          setTopCircleIndex(counter);
-          setTopCircleLetter(value);
-          counter++;
-        }, 500);
+        delay(SHORT_DELAY_IN_MS);
+        
+        setChangedIndexes((prevState) => [...prevState, counter - 1]);
+        setTopCircleIndex(counter);
+        setTopCircleLetter(value);
+        counter++;
       } else {
         clearInterval(interval);
-
+        
         linkedList.addByIndex(value, Number(indexValue));
+        
+        delay(SHORT_DELAY_IN_MS);
+        
+        setModifiedIndexes([Number(indexValue)]);
+        setLetters(linkedList.array);
+        setTopCircleIndex(-1);
+        setTopCircleLetter("");
 
-        setTimeout(() => {
-          setModifiedIndexes([Number(indexValue)]);
-          setLetters(linkedList.array);
-          setTopCircleIndex(-1);
-          setTopCircleLetter("");
-
-          setTimeout(() => {
-            setModifiedIndexes([]);
-            setChangedIndexes([]);
-            setIsLoading((prevState) => ({ ...prevState, addByIndex: false }));
-            setIsDisabled({
-              addToHead: false,
-              addToTail: false,
-              removeFromHead: false,
-              removeFromTail: false,
-              addByIndex: false,
-              removeByIndex: false,
-            });
-          }, 500);
-        }, 500);
+        delay(SHORT_DELAY_IN_MS);
+        
+        setModifiedIndexes([]);
+        setChangedIndexes([]);
+        setIsLoading((prevState) => ({ ...prevState, addByIndex: false }));
+        setIsDisabled({
+          addToHead: false,
+          addToTail: false,
+          removeFromHead: false,
+          removeFromTail: false,
+          addByIndex: false,
+          removeByIndex: false,
+        });
       }
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
     setIndexValue("");
     setValue("");
   };
@@ -424,29 +449,29 @@ export const ListPage: React.FC = () => {
           linkedList.deleteByIndex(Number(indexValue));
         }
 
-        setTimeout(() => {
-          setLetters(linkedList.array);
-          setBottomCircleIndex(-1);
-          setBottomCircleLetter("");
+        delay(SHORT_DELAY_IN_MS);
+        
+        setLetters(linkedList.array);
+        setBottomCircleIndex(-1);
+        setBottomCircleLetter("");
 
-          setTimeout(() => {
-            setChangedIndexes([]);
-            setIsLoading((prevState) => ({
-              ...prevState,
-              removeByIndex: false,
-            }));
-            setIsDisabled({
-              addToHead: false,
-              addToTail: false,
-              removeFromHead: false,
-              removeFromTail: false,
-              addByIndex: false,
-              removeByIndex: false,
-            });
-          }, 500);
-        }, 500);
+        delay(SHORT_DELAY_IN_MS);
+        
+        setChangedIndexes([]);
+        setIsLoading((prevState) => ({
+          ...prevState,
+          removeByIndex: false,
+        }));
+        setIsDisabled({
+          addToHead: false,
+          addToTail: false,
+          removeFromHead: false,
+          removeFromTail: false,
+          addByIndex: false,
+          removeByIndex: false,
+        });
       }
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
     setValue("");
     setIndexValue("");
   };
@@ -465,9 +490,8 @@ export const ListPage: React.FC = () => {
               <Input
                 placeholder="Введите значение"
                 maxLength={4}
-                type="text"
+                type="number"
                 isLimitText={true}
-                value={value.replace(/\D/g, "")}
                 onChange={handleInput}
               />
             </div>

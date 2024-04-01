@@ -4,6 +4,7 @@ import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import styles from "./fibonacci-page.module.css";
 import { Circle } from "../ui/circle/circle";
+import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 export const FibonacciPage: React.FC = () => {
   const [valueInput, setValueInput] = useState("");
@@ -57,7 +58,7 @@ export const FibonacciPage: React.FC = () => {
         clearInterval(interval);
         setLoading(false);
       }
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
   };
 
   return (

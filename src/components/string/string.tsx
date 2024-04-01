@@ -5,6 +5,7 @@ import { Button } from "../ui/button/button";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { ElementStates } from "../../types/element-states";
 import { Circle } from "../ui/circle/circle";
+import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 export const StringComponent: React.FC = () => {
 
@@ -58,7 +59,7 @@ export const StringComponent: React.FC = () => {
           clearInterval(interval);
           setLoading(false);
         }
-      }, 1000);
+      }, DELAY_IN_MS);
     } else {
       let i = 0;
 
@@ -75,7 +76,7 @@ export const StringComponent: React.FC = () => {
           clearInterval(interval);
           setLoading(false);
         }
-      }, 1000);
+      }, DELAY_IN_MS);
     }
   };
 
@@ -88,7 +89,7 @@ export const StringComponent: React.FC = () => {
     setArrayLetters(arr);
     setValueInput("");
 
-    setTimeout(() => reverseString(arr), 1000);
+    setTimeout(() => reverseString(arr), DELAY_IN_MS);
   };
 
   return (

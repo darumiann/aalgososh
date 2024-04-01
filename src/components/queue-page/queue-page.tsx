@@ -5,59 +5,8 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import styles from "./queue-page.module.css";
 import { ElementStates } from "../../types/element-states";
-
-export class Queue<T> {
-  container: (T | null)[] = [];
-  head = 0;
-  tail = 0;
-  readonly size: number = 0;
-  length: number = 0;
-
-  constructor(size: number) {
-    this.size = size;
-    this.container = Array(size);
-  }
-
-  get items() {
-    return [...this.container];
-  }
-
-  isEmpty = () => this.length === 0;
-
-  enqueue = (item: T) => {
-    if (this.length >= this.size) {
-      throw new Error("Maximum length exceeded");
-    }
-
-    this.container[this.tail % this.size] = item;
-    this.tail++;
-    this.length++;
-  };
-
-  dequeue = () => {
-    if (this.isEmpty()) {
-      throw new Error("No elements in the queue");
-    }
-
-    this.container[this.head % this.size] = null;
-    this.length--;
-    this.head++;
-  };
-
-  clear = () => {
-    this.container = Array(this.size);
-    this.head = 0;
-    this.tail = 0;
-    this.length = 0;
-  };
-}
-
-interface IQueue {
-  letter: string;
-  state: ElementStates;
-}
-
-const queue = new Queue<IQueue>(7);
+import { Queue, queue, IQueue } from "../../utils/queue-page_utils";
+import { DELAY_IN_MS, SHORT_DELAY_IN_MS, delay } from "../../constants/delays";
 
 export const QueuePage: React.FC = () => {
   const [value, setValue] = useState("");
@@ -88,31 +37,31 @@ export const QueuePage: React.FC = () => {
     setInd(tail);
     setColor(ElementStates.Changing);
     setLetters([...queue.items]);
-    setTimeout(() => {
-      setValue("");
-      setColor(ElementStates.Default);
-      setIsLoading({
-        addButton: false,
-        deleteButton: false,
-        clearButton: false,
-      });
-    }, 500);
+    delay(SHORT_DELAY_IN_MS);
+    
+    setValue("");
+    setColor(ElementStates.Default);
+    setIsLoading({
+      addButton: false,
+      deleteButton: false,
+      clearButton: false,
+    });
   };
   const handleDelete = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setIsLoading({ addButton: false, deleteButton: true, clearButton: false });
     setInd(head);
     setColor(ElementStates.Changing);
-    setTimeout(() => {
-      queue.dequeue();
-      setColor(ElementStates.Default);
-      setLetters([...queue.items]);
-      setIsLoading({
-        addButton: false,
-        deleteButton: false,
-        clearButton: false,
-      });
-    }, 500);
+    delay(SHORT_DELAY_IN_MS);
+    
+    queue.dequeue();
+    setColor(ElementStates.Default);
+    setLetters([...queue.items]);
+    setIsLoading({
+      addButton: false,
+      deleteButton: false,
+      clearButton: false,
+    });
   };
 
   const hadleClearAll = (e: React.MouseEvent<HTMLElement>) => {

@@ -6,11 +6,8 @@ import { Column } from "../ui/column/column";
 import styles from "./sorting-page.module.css";
 import { ElementStates } from "../../types/element-states";
 import { Direction } from "../../types/direction";
-
-export type TArray = {
-  value: number;
-  state: ElementStates;
-};
+import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { TArray } from "../../utils/sorting-page_utils";
 
 export const SortingPage: React.FC = () => {
   const [array, setArray] = useState<TArray[]>([]);
@@ -41,7 +38,7 @@ export const SortingPage: React.FC = () => {
         const value1 = array[j].value;
         const value2 = array[j + 1].value;
         setArray([...array]);
-        await setDelay(1000);
+        await setDelay(DELAY_IN_MS);
         if (mode ? value1 > value2 : value1 < value2) {
           array[j].value = value2;
           array[j + 1].value = value1;
@@ -76,7 +73,7 @@ export const SortingPage: React.FC = () => {
       for (let j = i + 1; j < array.length; j++) {
         array[j].state = ElementStates.Changing;
         setArray([...array]);
-        await setDelay(1000);
+        await setDelay(DELAY_IN_MS);
         if (
           mode
             ? array[j].value < array[smallestIndex].value
