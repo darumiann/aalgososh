@@ -359,7 +359,7 @@ const handleAddByIndex = async (e: React.MouseEvent<HTMLElement>) => {
                 maxLength={4}
                 type="text"
                 isLimitText={true}
-                value={value.replace(/\D/g, "")}
+                value={value}
                 onChange={handleInput}
               />
             </div>
@@ -415,7 +415,7 @@ const handleAddByIndex = async (e: React.MouseEvent<HTMLElement>) => {
                 type="number"
                 max={letters.length - 1}
                 onChange={handleIndexInput}
-                value={indexValue.replace(/\D/g, "")}
+                value={value}
               />
             </div>
             <div className={styles.container}>
