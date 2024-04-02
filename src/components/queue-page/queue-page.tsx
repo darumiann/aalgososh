@@ -37,7 +37,7 @@ export const QueuePage: React.FC = () => {
     setInd(tail);
     setColor(ElementStates.Changing);
     setLetters([...queue.items]);
-    delay(SHORT_DELAY_IN_MS);
+    await delay(SHORT_DELAY_IN_MS);
     
     setValue("");
     setColor(ElementStates.Default);
@@ -47,12 +47,12 @@ export const QueuePage: React.FC = () => {
       clearButton: false,
     });
   };
-  const handleDelete = (e: React.MouseEvent<HTMLElement>) => {
+  const handleDelete = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setIsLoading({ addButton: false, deleteButton: true, clearButton: false });
     setInd(head);
     setColor(ElementStates.Changing);
-    delay(SHORT_DELAY_IN_MS);
+    await delay(SHORT_DELAY_IN_MS);
     
     queue.dequeue();
     setColor(ElementStates.Default);
@@ -64,7 +64,7 @@ export const QueuePage: React.FC = () => {
     });
   };
 
-  const hadleClearAll = (e: React.MouseEvent<HTMLElement>) => {
+  const hadleClearAll = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     queue.clear();
     setLetters([...queue.items]);

@@ -8,11 +8,15 @@ import { ElementStates } from "../../types/element-states";
 import { INewStack, Stack, stack } from "../../utils/stack-page_utils";
 import { DELAY_IN_MS, SHORT_DELAY_IN_MS, delay } from "../../constants/delays";
 
-
 export const StackPage: React.FC = () => {
   const [value, setValue] = useState("");
   const [letters, setLetters] = useState<INewStack[]>([]);
   const [isLoading, setIsLoading] = useState({
+    addButton: false,
+    deleteButton: false,
+    clearButton: false,
+  });
+  const [isDisabled, setIsDisabled] = useState({
     addButton: false,
     deleteButton: false,
     clearButton: false,
@@ -26,31 +30,47 @@ export const StackPage: React.FC = () => {
     setValue(e.target.value);
   };
 
-  const handleAddValue = (e: React.MouseEvent<HTMLElement>) => {
+  const handleAddValue = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     if (!value) return null;
-    setIsLoading({ addButton: true, deleteButton: false, clearButton: false });
+    setIsLoading((prevState) => ({ ...prevState, addButton: true }));
+    setIsDisabled((prevState) => ({
+      ...prevState,
+      addButton: true,
+      deleteButton: true,      
+      clearButton: true,
+    }));
 
     stack.push({ letter: value, state: ElementStates.Changing });
     setValue("");
     setLetters([...stack.items]);
 
-    delay(SHORT_DELAY_IN_MS);
     stack.getByIndex(stack.size - 1, {
       letter: value,
       state: ElementStates.Default,
     });
     setLetters([...stack.items]);
-    setIsLoading({
+
+    await delay(SHORT_DELAY_IN_MS);
+    
+    setIsLoading((prevState) => ({ ...prevState, addButton: false }));
+    setIsDisabled((prevState) => ({
+      ...prevState,
       addButton: false,
-      deleteButton: false,
+      deleteButton: false,      
       clearButton: false,
-    });
+    }));
   };
 
-  const handleDelete = (e: React.MouseEvent<HTMLElement>) => {
+  const handleDelete = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    setIsLoading({ addButton: false, deleteButton: true, clearButton: false });
+    setIsLoading((prevState) => ({ ...prevState, deleteButton: true }));
+    setIsDisabled((prevState) => ({
+      ...prevState,
+      addButton: true,
+      deleteButton: true,      
+      clearButton: true,
+    }));
 
     stack.getByIndex(stack.size - 1, {
       letter: stack.items[stack.size - 1].letter,
@@ -58,21 +78,39 @@ export const StackPage: React.FC = () => {
     });
     setLetters([...stack.items]);
 
-    delay(SHORT_DELAY_IN_MS);
+    await delay(SHORT_DELAY_IN_MS);
     stack.pop();
     setLetters([...stack.items]);
-    setIsLoading({
+    setIsLoading((prevState) => ({ ...prevState, deleteButton: false }));
+    setIsDisabled((prevState) => ({
+      ...prevState,
       addButton: false,
-      deleteButton: false,
+      deleteButton: false,      
       clearButton: false,
-    });
+    }));
   };
 
-  const handleClearAll = (e: React.MouseEvent<HTMLElement>) => {
+  const handleClearAll = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     stack.clear();
     setLetters(stack.items);
-    setIsLoading({ addButton: false, deleteButton: false, clearButton: false });
+    setIsLoading((prevState) => ({ ...prevState, clearButton: true }));
+    setIsDisabled((prevState) => ({
+      ...prevState,
+      addButton: true,
+      deleteButton: true,      
+      clearButton: true,
+    }));
+
+    await delay(SHORT_DELAY_IN_MS);
+
+    setIsLoading((prevState) => ({ ...prevState, clearButton: false }));
+    setIsDisabled((prevState) => ({
+      ...prevState,
+      addButton: false,
+      deleteButton: false,      
+      clearButton: false,
+    }));
   };
   return (
     <SolutionLayout title="Стек">
@@ -88,21 +126,19 @@ export const StackPage: React.FC = () => {
           <Button
             text="Добавить"
             onClick={handleAddValue}
-            disabled={!value || isLoading.deleteButton}
+            disabled={value.length === 0 || letters.length < 0 || isDisabled.addButton}
             isLoader={isLoading.addButton}
           />
           <Button
             text="Удалить"
             onClick={handleDelete}
-            disabled={!letters.length || isLoading.addButton}
+            disabled={!letters.length || isDisabled.addButton}
             isLoader={isLoading.deleteButton}
           />
           <Button
             text="Очистить"
             onClick={handleClearAll}
-            disabled={
-              !letters.length || isLoading.addButton || isLoading.deleteButton
-            }
+            disabled={!letters.length || isDisabled.addButton || isDisabled.deleteButton}
             isLoader={isLoading.clearButton}
           />
         </form>
