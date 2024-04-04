@@ -120,7 +120,7 @@ export const StackPage: React.FC = () => {
             maxLength={4}
             isLimitText={true}
             placeholder="Введите значение"
-            value={value.replace(/\D/g, "")}
+            value={value}
             onChange={handleInput}
           />
           <Button

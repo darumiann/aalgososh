@@ -48,8 +48,8 @@ export const ListPage: React.FC = () => {
   const handleAddToHead = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setIsLoading((prevState) => ({ ...prevState, addToHead: true }));
-    setIsDisabled((prevState) => ({
-      ...prevState,
+    setIsDisabled((prevstate) => ({
+      ...prevstate,
       removeFromHead: true,
       removeFromTail: true,
     }));
@@ -76,13 +76,11 @@ export const ListPage: React.FC = () => {
       removeFromHead: false,
       removeFromTail: false,
     }));
-    setIndexValue("");
-    setValue("");
   };
 
   const handleAddToTail = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    setIsLoading((prevState) => ({ ...prevState, addInTail: true }));
+    setIsLoading((prevState) => ({ ...prevState, addToTail: true }));
     setIsDisabled((prevstate) => ({
       ...prevstate,
       removeFromHead: true,
@@ -105,15 +103,12 @@ export const ListPage: React.FC = () => {
     await delay(SHORT_DELAY_IN_MS);
     
     setModifiedIndexes([]);
-    setIsLoading((prevState) => ({ ...prevState, addInTail: false }));
+    setIsLoading((prevState) => ({ ...prevState, addToTail: false }));
     setIsDisabled((prevstate) => ({
       ...prevstate,
       removeFromHead: false,
       removeFromTail: false,
     }));
-    
-    setIndexValue("");
-    setValue("");
   };
   
   const handleDeleteFromHead = async (e: React.MouseEvent<HTMLElement>) => {
@@ -179,8 +174,8 @@ export const ListPage: React.FC = () => {
     setBottomCircleIndex(-1);
     setBottomCircleLetter("");
     setIsLoading((prevState) => ({ ...prevState, removeFromTail: false }));
-    setIsDisabled((prevState) => ({
-      ...prevState,
+    setIsDisabled((prevstate) => ({
+      ...prevstate,
       removeFromHead: false,
     }));
   };
@@ -217,7 +212,7 @@ export const ListPage: React.FC = () => {
         setLetters(linkedList.array);
         setTopCircleIndex(-1);
         setTopCircleLetter("");
-
+        
         await delay(SHORT_DELAY_IN_MS);
 
         setModifiedIndexes([]);
@@ -232,9 +227,9 @@ export const ListPage: React.FC = () => {
           removeByIndex: false,
         });
       }
-    setIndexValue("");
-    setValue("");
-  });
+  }, SHORT_DELAY_IN_MS);
+  setIndexValue("");
+  setValue("");;
 };
 
   const handleDeleteByIndex = async (e: React.MouseEvent<HTMLElement>) => {
@@ -298,9 +293,9 @@ export const ListPage: React.FC = () => {
           removeByIndex: false,
         });
       }
-      setValue("");
-      setIndexValue("");
-    })
+    }, SHORT_DELAY_IN_MS);
+    setIndexValue("");
+    setValue("");;
   };
 
   const getCurrentState = (index: number): ElementStates => {

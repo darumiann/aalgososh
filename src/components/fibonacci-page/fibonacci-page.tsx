@@ -70,7 +70,7 @@ export const FibonacciPage: React.FC = () => {
             maxLength={19}
             type="number"
             isLimitText={true}
-            value={valueInput.replace(/\D/g, "") || ""}
+            value={valueInput}
             onInput={handleInput}
           />
           <Button
