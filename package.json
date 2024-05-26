@@ -18,11 +18,12 @@
     "typescript": "^4.5.5",
     "web-vitals": "^2.1.4"
   },
-  "scripts": {
+  "scripts": {    
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",    
+    "open": "cypress open"
   },
   "eslintConfig": {
     "extends": [
@@ -45,7 +46,7 @@
   "devDependencies": {
     "@types/react": "^18.2.73",
     "@types/react-router-dom": "^5.3.3",
-    "cypress": "^13.8.1",
+    "cypress": "^13.10.0",
     "eslint-plugin-cypress": "^3.2.0",
     "fetch-mock": "^9.11.0",
     "jest": "^27.5.1",

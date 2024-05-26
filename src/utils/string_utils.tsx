@@ -25,9 +25,9 @@ export const reverseString = async (
 
     if (i !== len - i) {
       arr[i].color = ElementStates.Changing;
-      arr[len - i].color = ElementStates.Changing;
-      setResultArr([...arr]);
       await setDelay(DELAY_IN_MS);
+      arr[len - i].color = ElementStates.Changing;
+      setResultArr([...arr]);  
     }
 
     let tmp = arr[i];

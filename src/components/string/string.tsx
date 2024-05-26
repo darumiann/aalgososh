@@ -22,7 +22,7 @@ export const StringComponent: React.FC = () => {
     setValueInput(e.currentTarget.value);
   };
 
-  const clickButton = () => {
+  const clickButton = async () => {
     const arr = valueInput
       .split("")
       .map((value) => ({ value, color: ElementStates.Default }));
