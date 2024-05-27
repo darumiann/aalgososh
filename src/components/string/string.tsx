@@ -5,7 +5,7 @@ import { Button } from "../ui/button/button";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { ElementStates } from "../../types/element-states";
 import { Circle } from "../ui/circle/circle";
-import { DELAY_IN_MS, SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { reverseString } from "../../utils/string_utils";
 
 export const StringComponent: React.FC = () => {
 
@@ -22,75 +22,12 @@ export const StringComponent: React.FC = () => {
     setValueInput(e.currentTarget.value);
   };
 
-  const changeColor = (arr: TArray[], i: number, color: ElementStates) => {
-    arr[i].color = color;
-    arr[arr.length - i - 1].color = color;
-    const newArr: TArray[] = arr.concat();
-
-    setArrayLetters(newArr);
-  };
-
-  const swap = (
-    arr: TArray[],
-    firstIndex: number,
-    secondIndex: number
-  ): void => {
-    const temp = arr[firstIndex];
-    arr[firstIndex] = arr[secondIndex];
-    arr[secondIndex] = temp;
-  };
-
-  const reverseString = (arr: TArray[]) => {
-    const n = Math.floor(arr.length / 2);
-
-    if (arr.length % 2 === 0) {
-      let i = 0;
-
-      changeColor(arr, i, ElementStates.Changing);
-
-      const interval = setInterval(() => {
-        swap(arr, arr.length - i - 1, i);
-        changeColor(arr, i, ElementStates.Modified);
-
-        if (i < n - 1) {
-          i++;
-          changeColor(arr, i, ElementStates.Changing);
-        } else {
-          clearInterval(interval);
-          setLoading(false);
-        }
-      }, DELAY_IN_MS);
-    } else {
-      let i = 0;
-
-      changeColor(arr, i, ElementStates.Changing);
-
-      const interval = setInterval(() => {
-        swap(arr, arr.length - i - 1, i);
-        changeColor(arr, i, ElementStates.Modified);
-
-        if (i < n) {
-          i++;
-          changeColor(arr, i, ElementStates.Changing);
-        } else {
-          clearInterval(interval);
-          setLoading(false);
-        }
-      }, DELAY_IN_MS);
-    }
-  };
-
-  const clickButton = () => {
-    setLoading(true);
+  const clickButton = async () => {
     const arr = valueInput
       .split("")
       .map((value) => ({ value, color: ElementStates.Default }));
-
-    setArrayLetters(arr);
-    setValueInput("");
-
-    setTimeout(() => reverseString(arr), DELAY_IN_MS);
-  };
+    reverseString(arr, setLoading, setArrayLetters);
+  }
 
   return (
     <SolutionLayout title="Строка">
